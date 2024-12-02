@@ -78,9 +78,9 @@ forge coverage
 
 
 ## Acknowledgments
-[Cyfrin Updrafts](https://www.cyfrin.io/updraft): For providing great courses and comprehensive course materials.
-[Foundry](https://github.com/foundry-rs/foundry): For the robust development framework.
-[Chainlink](https://chain.link/): For secure randomness and automation.
-[Alchemy](https://www.alchemy.com/): For providing excellent node-as-a-service for testing.
+- [Cyfrin Updrafts](https://www.cyfrin.io/updraft): For providing great courses and comprehensive course materials.
+- [Foundry](https://github.com/foundry-rs/foundry): For the robust development framework.
+- [Chainlink](https://chain.link/): For secure randomness and automation.
+- [Alchemy](https://www.alchemy.com/): For providing excellent node-as-a-service for testing.
 ## License
 This project is licensed under the MIT License. 
