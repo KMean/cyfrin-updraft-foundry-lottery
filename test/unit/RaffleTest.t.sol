@@ -213,60 +213,41 @@ contract RaffleTest is CodeConstants, Test {
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(randomRequest, address(raffle));
     }
 
-    function testFulfillrandomwordsPicksAWinnerResetsAndSendsMoney() public raffleEntered {
-        // Arrange
-        uint256 additionalEntrances = 3; // so 4 people total since the raffleEntered modifier has PLAYER enter the raffle first.
-        uint256 startingIndex = 1;
+    function testFulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public raffleEntered skipFork {
         address expectedWinner = address(1);
 
+        // Arrange
+        uint256 additionalEntrances = 3;
+        uint256 startingIndex = 1; // We have starting index be 1 so we can start with address(1) and not address(0)
+
         for (uint256 i = startingIndex; i < startingIndex + additionalEntrances; i++) {
-            // this is a way to turn any uint into an address. this is like saying address(1)
-            address newPlayer = address(uint160(i));
-            // gives newPlayer ether and makes the next transaction come from NewPlayer. `hoax` is a cheatcode that combines vm.deal and vm.prank. Hoax only works with uint160s.
-            hoax(newPlayer, 1 ether);
-            // newPlayer enters raffle
-            raffle.enterRaffle{value: entranceFee}();
+            address player = address(uint160(i));
+            hoax(player, 1 ether); // deal 1 eth to the player
+            raffle.enterRaffle{value: raffleEntranceFee}();
         }
-        // get the timestamp of when the contract was deployed
+
         uint256 startingTimeStamp = raffle.getLastTimeStamp();
-        uint256 winnerStartingBalance = expectedWinner.balance;
+        uint256 startingBalance = expectedWinner.balance;
 
         // Act
-        // record all logs(including event data) from the next call
         vm.recordLogs();
-        // call performUpkeep
-        raffle.performUpkeep("");
-        // take the recordedLogs from `performUpkeep` and stick them into the entries array
+        raffle.performUpkeep(""); // emits requestId
         Vm.Log[] memory entries = vm.getRecordedLogs();
-        // entry 0  is for the VRF coordinator
-        // entry 1 is for our event data
-        // topic 0 is always resevered for
-        // topic 1 is for our indexed parameter
-        bytes32 requestId = entries[1].topics[1];
-        // call fulfillRandomWords from the vrfCoordinator and we are inputting the requestId that we got from the logs when we called performUpkeep; and we are also inputting the raffle contract since its the consumer(fulfillRandomWords function takes parameters from the VRFCoordinatorV2_5Mock ).
-        VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(uint256(requestId), address(raffle)); // we typecast the requestId back into a uint256 since it was stored as bytes
-        // Assert
-        // saving the recent winner from the getter function in raffle.sol to a variable named recentWinner
-        address recentWinner = raffle.getRecentWinner();
-        // saving the raffleState from the getter function in raffle.sol to a variable type RaffleState named raffleState
-        Raffle.RaffleState raffleState = raffle.getRaffleState();
-        // saves the balance of the recentWinner to a variable named winnerBalance
-        uint256 winnerBalance = recentWinner.balance; // `balance` is a solidity keyword
-        // fulfillRandomWords updates the timestamp in raffle.sol, so by calling getLastTimeStamp here, we get the new timeStamp that was saved.
-        uint256 endingTimeStamp = raffle.getLastTimeStamp();
-        // since there is 4 people in this raffle, it muliplies the number of players times their entrance fee to get how much the prize is worth.
-        uint256 prize = entranceFee * (additionalEntrances + 1);
+        console2.logBytes32(entries[1].topics[1]);
+        bytes32 requestId = entries[1].topics[1]; // get the requestId from the logs
+
+        VRFCoordinatorV2_5Mock(vrfCoordinatorV2_5).fulfillRandomWords(uint256(requestId), address(raffle));
 
         // Assert
+        address recentWinner = raffle.getRecentWinner();
+        Raffle.RaffleState raffleState = raffle.getRaffleState();
+        uint256 winnerBalance = recentWinner.balance;
+        uint256 endingTimeStamp = raffle.getLastTimeStamp();
+        uint256 prize = raffleEntranceFee * (additionalEntrances + 1);
 
         assert(recentWinner == expectedWinner);
-        // assert that the raffle restarted
-        assert(raffleState == Raffle.RaffleState.OPEN);
-        // assert(uint256(raffleState) == 0); // This is the same as the line above since `OPEN` in index 0 of the enum in Raffle.sol.
-
-        // assert that the winners received the funds/prize
-        assert(winnerBalance == winnerStartingBalance + prize);
-
+        assert(uint256(raffleState) == 0);
+        assert(winnerBalance == startingBalance + prize);
         assert(endingTimeStamp > startingTimeStamp);
     }
 
