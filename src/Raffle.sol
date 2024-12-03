@@ -1,5 +1,5 @@
 //SPDX License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 /**
  * @title Raffle
@@ -9,7 +9,6 @@ pragma solidity 0.8.19;
  */
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
-import {console2} from "forge-std/Script.sol";
 
 contract Raffle is VRFConsumerBaseV2Plus {
     /* errors */
@@ -122,10 +121,8 @@ contract Raffle is VRFConsumerBaseV2Plus {
         emit WinnerPicked(recentWinner);
         (bool success,) = recentWinner.call{value: address(this).balance}("");
         if (!success) {
-            console2.log("Transfer failed", success);
             revert Raffle__TransferFailed();
         }
-        console2.log("OUT", success);
     }
 
     /**
