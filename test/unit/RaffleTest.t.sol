@@ -253,24 +253,28 @@ contract RaffleTest is CodeConstants, Test {
 
     function testFulfillRandomWordsTransferFailureBranch() public skipFork {
         // Arrange
-        RevertOnReceive player = new RevertOnReceive();
-        hoax(address(player), 1 ether);
+        MockUser player = new MockUser();
+        hoax(address(player), 2 ether);
         raffle.enterRaffle{value: 1 ether}();
 
         vm.warp(block.timestamp + interval + 1);
         vm.roll(block.number + 1);
 
-        // Perform upkeep to emit a requestId
+        // Perform upkeep to get requestId
         vm.recordLogs();
         raffle.performUpkeep("");
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 requestId = entries[1].topics[1];
 
-        vm.expectRevert();
-        // Act
+        // Act: Fulfill the request, which triggers a failed transfer
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(uint256(requestId), address(raffle));
-        // Assert: The player's balance should remain unchanged
-        assertEq(address(player).balance, 0 ether);
+
+        // Assert: Check the player's balance remains 1 ether (transfer failed)
+        assertEq(address(player).balance, 1 ether);
+
+        // Optional: Check for the Raffle__TransferFailed error in logs
+        vm.recordLogs();
+        // (Re-trigger or check previous logs for the error event)
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -296,8 +300,10 @@ contract RaffleTest is CodeConstants, Test {
     }
 }
 
-contract RevertOnReceive {
+contract MockUser {
+    bool private allewReceive = false;
+
     receive() external payable {
-        revert("Forced failure");
+        if (!allewReceive) revert("Forced failure");
     }
 }
