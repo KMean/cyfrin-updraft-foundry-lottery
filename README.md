@@ -40,6 +40,9 @@ Before you begin, ensure you have the following installed:
     ```env
     SEPOLIA_RPC_URL=your-sepolia-rpc-url
     AMOY_RPC_URL=your-amoy-rpc-url
+    CHAINLINK_VRF_SEPOLIA_SUBSCRIPTION_ID=your-sepolia-chainlink-vrf-subid
+    CHAINLINK_VRF_AMOY_SUBSCRIPTION_ID=your-amoy-chainlink-vrf-subid
+    ACCOUNT=your-account-address-used-to-create-subids
     ```
 4. Compile Contracts:
     ```bash
