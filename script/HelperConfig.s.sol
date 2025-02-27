@@ -54,29 +54,34 @@ contract HelperConfig is CodeConstants, Script {
         return getConfigByChainId(block.chainid);
     }
 
-    function getSepoliaConfig() public pure returns (NetworkConfig memory) {
+    function getSepoliaConfig() public view returns (NetworkConfig memory) {
+        uint256 chainlinkVrfSepoliaSubscriptionId = vm.envUint("CHAINLINK_VRF_SEPOLIA_SUBSCRIPTION_ID");
+        address account = vm.envAddress("ACCOUNT");
         return NetworkConfig({
             entranceFee: 0.01 ether,
             interval: 30 seconds,
             vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,
             keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
-            subscriptionId: 92912893321928830876765544058373703346150501163827818919661610957836575975005,
+            subscriptionId: chainlinkVrfSepoliaSubscriptionId,
             callbackGasLimit: 500000,
             linkToken: 0x779877A7B0D9E8603169DdbD7836e478b4624789,
-            account: 0xc6CD8842EB67684a763Fe776843f693bB3e48850
+            account: account
         });
     }
 
-    function getAmoyConfig() public pure returns (NetworkConfig memory) {
+    function getAmoyConfig() public view returns (NetworkConfig memory) {
+        uint256 chainlinkVrfAmoySubscriptionId = vm.envUint("CHAINLINK_VRF_AMOY_SUBSCRIPTION_ID");
+        address account = vm.envAddress("ACCOUNT");
+
         return NetworkConfig({
             entranceFee: 0.01 ether,
             interval: 30 seconds,
             vrfCoordinator: 0x343300b5d84D444B2ADc9116FEF1bED02BE49Cf2,
             keyHash: 0x3f631d5ec60a0ce16203bcd6aff7ffbc423e22e452786288e172d467354304c8,
-            subscriptionId: 13706559019438070441991592172454793127526154298938152266421088026372246684282,
+            subscriptionId: chainlinkVrfAmoySubscriptionId,
             callbackGasLimit: 500000,
             linkToken: 0x0Fd9e8d3aF1aaee056EB9e802c3A762a667b1904,
-            account: 0xc6CD8842EB67684a763Fe776843f693bB3e48850
+            account: account
         });
     }
 
