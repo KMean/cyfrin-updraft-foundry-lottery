@@ -1,6 +1,6 @@
 # Foundry Lottery
 
-A decentralized lottery smart contract built with Foundry, following [Cyfrin Updrafts](https://www.cyfrin.io/updraft) course. This project demonstrates how to create a secure and efficient lottery system on the Ethereum blockchain using Chainlink VRF for randomness.
+A decentralized lottery smart contract built with Foundry, following [Cyfrin Updraft](https://www.cyfrin.io/updraft) course. This project demonstrates how to create a secure and efficient lottery system on the Ethereum blockchain using Chainlink VRF for randomness.
 
 ---
 
